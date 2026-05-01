@@ -1,0 +1,361 @@
+NLink V1.4
+NLink_LinkTrack_Anchor_Frame0 (Length: 896Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x00 1
+id uint8 1  ID corresponding to this block (Invalid when the value equals "0xFF")
+Block0role uint8 1 Role corresponding to this block, value = TAG,  refer to the Role Table for more information
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m
+{dis0, dis1, dis2, dis3, dis4, dis5, dis6, dis7} * 100 uint16 16 Distance from the tag to the corresponding anchor, unit: m
+id uint8 1  ID corresponding to this block (Invalid when the value equals "0xFF")
+Block1role uint8 1 Role corresponding to this block, value = TAG,  refer to the Role Table for more information
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m
+{dis0, dis1, dis2, dis3, dis4, dis5, dis6, dis7} * 100 uint16 16 Distance from the tag to the corresponding anchor, unit: m
+…… Block2~Block28
+id uint8 1  ID corresponding to this block (Invalid when the value equals "0xFF")
+Block29role uint8 1 Role corresponding to this block, value = TAG,  refer to the Role Table for more information
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m
+{dis0, dis1, dis2, dis3, dis4, dis5, dis6, dis7} * 100 uint16 16 Distance from the tag to the corresponding anchor, unit: m
+reserved * 67 Reserved 812
+local_time uint32 4  Time of local node, unit: ms 879
+reserved * 4 reserved 883
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 887
+system_time uint32 4  Time of system, unit: ms 889
+id uint8 1 Local node ID 893
+role uint8 1 Local node role,  refer to the Role Table for more information 894
+Checksum uint8 1 Value = 0xEE 895
+NLink_LinkTrack_Tag_Frame0 (Length: 128Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x01 1
+id uint8 1 ID 2
+role uint8 1 Local node role,  refer to the Role Table for more information 3
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m 4
+{vel.x, vel.y, vel.z} * 10000 int24 9 Velocity of the tag, unit: m/s 13
+{dis0, dis1, dis2, dis3, dis4, dis5, dis6, dis7} * 1000 int24 24 Distance from the tag to the corresponding anchor, unit: m 22
+{g.x, g.y, g.z} float 12 IMU angular velocity, unit: rad/s 46
+{a.x, a.y, a.z} float 12 IMU acceleration, unit: m/s^2 58
+reserved float 12 * 70
+{angle.x, angle.y, angle.z}*100 int16 6 Euler angle of the tag, unit: deg 82
+{q0, q1, q2, q3} float 16 Quaternion 88
+reserved * 4 Reserved 104
+local_time uint32 4 Time of local node, unit: ms 108
+system_time uint32 4 Time of system, unit: ms 112
+reserved uint8 1 reserved 116
+{eop.x, eop.y, eop.z} * 100 uint8 3 Estimation of the tag position's precision, unit: m 117
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 120
+reserved * 5 Reserved 122
+Checksum uint8 1 The Checksum is equal to all previous bytes added 127
+NLink_LinkTrack_Node_Frame0 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x02 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id uint8 1 Current node ID 5
+reserved * 4 Reserved 6
+valid_node_quantity uint8 1 Total valid nodes 10
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information 11
+id uint8 1  ID corresponding to this block 12
+data_length uint16 2 Transparent data length 13
+data[length] uint8 1*length Transparent data 15
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information 16
+id uint8 1 ID corresponding to this block 17
+data length uint16 2 Transparent data length 18
+data[length] uint8 1*length Transparent data 20
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame1 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x03 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id uint8 1 Current node ID 5
+system_time uint32 4 Time of system, unit: ms 6
+local_time uint32 4 Time of local node, unit: ms 10
+reserved * 10 Reserved 14
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 24
+valid_node_quantity uint8 1 Total valid nodes 26
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block0id uint8 1  ID corresponding to this block
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m
+reserved * 9 Reserved
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block1id uint8 1 ID corresponding to this block
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m
+reserved * 9 Reserved
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame2 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x04 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id uint8 1 Local node ID 5
+system_time uint32 4 Time of system, unit:ms 6
+{eop.x, eop.y, eop.z} * 100 uint8 3 Estimation of the tag position's precision, unit: m 10
+{pos.x, pos.y, pos.z} * 1000 int24 9 Position of the tag, unit: m 13
+{vel.x, vel.y,vel.z} * 10000 int24 9 Velocity of the tag, unit: m/s 22
+reserved int24 9 Reserved 31
+{g.x, g.y, g.z} float 12 IMU angular velocity, unit: rad/s 40
+{a.x, a.y, a.z} float 12 IMU acceleration, unit: m/s^2 52
+reserved float 12 * 64
+{angle.x, angle.y, angle.z}*100 int16 6 Euler angle of the tag, unit: deg 76
+{q0, q1, q2, q3} float 16 Quaternion 82
+reserved * 4 Reserved 98
+local_time uint32 4 Time of local node, unit:ms 102
+reserved * 10 Reserved 106
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 116
+valid_node_quantity uint8 1 Total valid nodes 118
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block0id uint8 1  ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+reserved * 6 Reserved
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block1id uint8 1 ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+reserved * 6 Reserved
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame3 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x05 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id uint8 1 Local node ID 5
+
+local_time uint32 4 Time of local node, unit:ms 6
+system_time uint32 4 Time of system, unit:ms 10
+reserved * 4 Reserved 14
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 18
+valid_node_quantity uint8 1 Total valid nodes 20
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block0id uint8 1  ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block1id uint8 1 ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame4 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x06 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id uint8 1 Local node ID 5
+local_time uint32 4 Time of local node, unit:ms 6
+system_time uint32 4 Time of system, unit:ms 10
+reserved * 4 Reserved 14
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 18
+valid_tag_quantity uint8 1 Total valid tags 20
+tag_id uint8 1 TAG ID
+Block0reserved * 2 Reserved
+tag_voltage * 20 uint8 1 Interface supply voltage of the TAG, unit: V
+anchor_quantity uint8 1 Total valid anchors, the value doesn't exceed 8
+anchor_id uint8 1 ANCHOR ID
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+anchor_id uint8 1 ANCHOR ID
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+...
+tag_id uint8 1 TAG ID
+Block1reserved * 2 Reserved
+tag_voltage * 20 uint8 1 Interface supply voltage of the TAG, unit: V
+anchor_quantity uint8 1 Total valid anchors
+anchor_id uint8 1 ANCHOR ID
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+anchor_id uint8 1 ANCHOR ID
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+...
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame5 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x08 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id[4] uint8 4 Local node ID 5
+local_time uint32 4 Time of local node, unit:ms 9
+system_time uint32 4 Time of system, unit:ms 13
+reserved * 4 Reserved 17
+voltage * 1000 uint16 2 Interface supply voltage of the local node, unit: V 21
+valid_node_quantity uint8 1 Total valid nodes 23
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block0id [4] uint8 4  ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block1id [4] uint8 4 ID corresponding to this block
+dis * 1000 int24 3 Distance from the tag to the corresponding anchor, unit: m
+fp_rssi * (-2) uint8 1 First path power level, unit: dB
+rx_rssi * (-2) uint8 1 Received power level, unit: dB
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_Node_Frame6 (Length: Frame_Length Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x55 0
+Function Mark uint8 1 Value = 0x09 1
+Frame Length uint16 2 Frame length 2
+role uint8 1 Local node role, refer to the Role Table for more information 4
+id[4] uint8 4 Current node ID 5
+reserved * 4 Reserved 9
+valid_node_quantity uint8 1 Total valid nodes 13
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block0id[4] uint8 4  ID corresponding to this block
+data_length uint16 2 Transparent data length
+data[length] uint8 1*length Transparent data
+role uint8 1 Role corresponding to this block, refer to the Role Table for more information
+Block1id[4] uint8 4 ID corresponding to this block
+data length uint16 2 Transparent data length
+data[length] uint8 1*length Transparent data
+…… Block...
+Checksum uint8 1 The Checksum is equal to all previous bytes added Frame_Length - 1
+NLink_LinkTrack_User_Frame1 (Length:  (11 +  data_length) Bytes) --- WO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x54 0
+Function Mark uint8 1 Value = 0xF1 1
+reserved * 4 Reserved. The byte written must be 0xFF 2
+remote_role uint8 1 Value = NODE/SLAVE, refer to the Role Table for more information 6
+remote_id uint8 1 Remote ID. Range: [0,254] 7
+data_length uint16 2 Transparent data length 8
+data[length] uint8 1*length Transparent data 10
+Checksum uint8 1 The Checksum is equal to all previous bytes added 10 + data_length
+NLink_LinkTrack_Setting_Frame0 (Length: 128 Bytes) --- RW
+Data Type Length (Bytes) Description
+Frame Header uint8 1 Value = 0x54 --- RW 0
+Function Mark uint8 1 Value = 0x00 --- RW 1
+mix uint8 1bit0: [0: write],[1: read] --- WO
+2bit1: [0: none],[1: remote_switch_setting] --- WO
+bit2: [0: none],[1: restart_current_node_after_setting] --- WO
+bit3: [0: none],[1: restart_current_node] --- WO
+bit4: [0: none],[1: restore_factory] --- WO
+bit5: [0: none],[1: read_cm_mode_param] --- WO
+role uint8 1 enum{NODE,ANCHOR,TAG,CONSOLE,MASTER,SLAVE} --- RW 3
+math_model uint8 1role = TAG: enum{MATH_MODEL0,MATH_MODEL1,MATH_MODEL2} --- RW4role = other: Value = 0xFF --- RW
+uart_baudrate uint24 3 enum{115200,230400,460800,921600,1000000,1200000,1500000,2000000,3000000} --- RW 5
+system_ch uint8 1 Range: [0,11] --- RW 8
+id uint8 1 Refer to LP Mode Table --- RW 9
+update_rate uint16 2 Refer to LP Mode Table --- RW 10
+system_id uint8 1 Range: [0,255] --- RW 12
+reserved uint8 1 Reserved. The byte written must be 0xFF 13
+on_off uint8 1bit0: [0: uart_led_off], [1: uart_led_on] --- RW14bit7-1: Reserved
+reserved uint8 1 Reserved. The byte written must be 0xFF 15
+filter_property uint8 1 Range: [0,255] --- RW 16
+mode uint8 1bit3-0: mode_run--
+>enum{LP_MODE0,LP_MODE1,Reserved,DT_MODE0,DT_MODE1,DT_MODE2,DR_MODE1,Reserved,CM_MODE,Reserved,DR_MODE0,Reserve
+d,LP_MODE4,LP_MODE5,LP_MODE6,MEM_MODE}, 
+"Blue Mark: mix=remote_switch_setting" is effective --- RW17
+bit7-4: mode_mem
+reserved * 1 Reserved 18
+protocol uint8 1 Reference Role Rule --- RW 19
+
+tx_gain uint8 1 Range: [0,33.5]dB ---> [0,67] --- RW 20
+reserved uint8 3 Reserved 21
+node_capacity uint8 1 DR_MODE: node_capacity, Others: invalid -- RW 24
+reserved uint8 2 Reserved 25
+local_time uint32 4terminal_system_time: uint:ms --- WO27local_time: uint:ms --- RO
+reserved uint8 5 Reserved 31
+anchor_group_index uint8 1anchor_group_index=0: A0-A9 --- RW
+36 anchor_group_index=1: A10-A19 --- RW
+anchor_group_index=2: A20-A29 --- RW
+{a0_coordinate.x, a0_coordinate.y, a0_coordinate.z}* 1000 int24 9 Unit: m --- RW 37
+{a1_coordinate.x, a1_coordinate.y, a1_coordinate.z}* 1000 int24 9 Unit: m --- RW 46
+{a2_coordinate.x, a2_coordinate.y, a2_coordinate.z}* 1000 int24 9 Unit: m --- RW 55
+{a3_coordinate.x, a3_coordinate.y, a3_coordinate.z}* 1000 int24 9 Unit: m --- RW 64
+{a4_coordinate.x, a4_coordinate.y, a4_coordinate.z}* 1000 int24 9 Unit: m --- RW 73
+{a5_coordinate.x, a5_coordinate.y, a5_coordinate.z}* 1000 int24 9 Unit: m --- RW 82
+{a6_coordinate.x, a6_coordinate.y, a6_coordinate.z}* 1000 int24 9 Unit: m --- RW 91
+{a7_coordinate.x, a7_coordinate.y, a7_coordinate.z}* 1000 int24 9 Unit: m --- RW 100
+{a8_coordinate.x, a8_coordinate.y, a8_coordinate.z}* 1000 int24 9 Unit: m --- RW 109
+{a9_coordinate.x, a9_coordinate.y, a9_coordinate.z}* 1000 int24 9 Unit: m --- RW 118
+Checksum uint8 1 The Checksum is equal to all previous bytes added. --- RW 127
+NLink_System_Common_Frame0 (Length: 32 Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x52 --- RW 0
+Function Mark uint8 1 Value = 0x00 --- RW 1
+mix uint8 1 bit0: [0: write],[1: read] --- WO 2
+product_versionuint8 1 product_version_l: decimal fraction --- RO 3
+uint8 1 product_version_h: integer --- RO 4
+hardware_versionuint8 1 hardware_version_l: decimal fraction --- RO 5
+uint8 1 hardware_version_h: integer --- RO 6
+firmware_versionuint8 1 firmware_version_b --- RO 7
+uint8 1 firmware_version_l --- RO 8
+uint8 1 firmware_version_m  --- RO 9
+uint8 1 firmware_version_h --- RO 10
+reserved * 8 Reserved. The byte written must be 0xFF 11
+uart_baudrate uint24 3 reference lps_setting_frame.uart_baudrate --- RO 19
+role uint8 1 enum{NODE,ANCHOR,TAG,CONSOLE,MASTER,SLAVE} --- RW 22
+id uint8 1 Refer to Mode Table --- RW 23
+reserved * 7 Reserved. The byte written must be 0xFF 24
+Checksum uint8 1 The Checksum is equal to all previous bytes added. --- RW 31
+NLink_LinkTrack_Error_Frame0 (Length: 32 Bytes) --- RO
+Data Type Length (Bytes) Description Index
+Frame Header uint8 1 Value = 0x54 0
+Function Mark uint8 1 Value = 0xFA 1
+Frame Length uint16 2 Value = 32 2
+role uint8 1 Reference Role Table --- RO 4
+id uint8 1 Local node ID --- RO 5
+local_time uint32 4 Time of  local node, unit:ms --- RO 6
+reserved * 4 Reserved. The bytes written must be 0xFF 10
+error_type uint8 1bit0: [0: none],[1: node repeat] --- RO
+14bit1: [0: none],[1: lps_setting_frame error] --- RO
+bit2: [0: none],[1: anchor coordinate error] --- RO
+bit3: [0: none],[1: restart] --- RO
+bit4: [0: none],[1: hard_fault] --- RO
+bit5: [0: none],[1: uwb_tx_error] --- RO
+bit6: [0: none],[1: pos_abnormal_zero] --- RO
+bit7: [0: none],[1: dt_length_exceed] --- RO
+reserved * 2 Reserved. 15
+error_type_mark0 uint8 1 range[0,255] 17
+error_type_mark1 uint8 1 range[0,255] 18
+error_type_mark2 uint8 1 range[0,255] 19
+reserved * 11 Reserved. 20
+Checksum uint8 1 The Checksum is equal to all previous bytes added.. --- WO Frame_Length - 1
+LP Mode Table
+mode update_rate id
+LP_MODE0 1,2,5,10,25,50 ANCHOR: 8, TAG: 40, CONSOLE: 1
+LP_MODE1 1,2,5,10,20 ANCHOR: 30, TAG: 40, CONSOLE: 1
+LP_MODE2 1,2,5,10 ANCHOR: 8, TAG: 200, CONSOLE: 1
+LP_MODE3 1,5,25 ANCHOR: 13, TAG: 100, CONSOLE: 1
+LP_MODE4 1,2,5,10 ANCHOR: 120, TAG: 40, CONSOLE: 1
+LP_MODE5 1,2,5,10,25,50,100,200 ANCHOR: 4, TAG: 4, CONSOLE: 0
+LP_MODE6 1,2,5,10,25,50,100,200 ANCHOR: 6, TAG: 16, CONSOLE: 1
+Role Table(In DR_MODE0 and DR_MODE1,the role is NODE, the default value is 0, but it can be set to 0 to 254)
+enum{NODE, ANCHOR, TAG, CONSOLE, MASTER, SLAVE} 
+LinkTrack  Protocol  Table
+enum{ANCHOR_FRAME0, TAG_FRAME0, NODE_FRAME0, NODE_FRAME1, NODE_FRAME2, NODE_FRAME3, NODE_FRAME4,NODE_FRAME5,NODE_FRAME6}
+NMEA-0183 = 0x80. Used for tag only.
+Protocol  Rule
+mode role protocol
+LP_MODE0/1/2/3/4/5ANCHOR/CONSOLE LINKTRACK_ANCHOR_FRAME0, LINKTRACK_NODE_FRAME1, LINKTRACK_NODE_FRAME4
+TAG LINKTRACK_TAG_FRAME0, LINKTRACK_NODE_FRAME2, LINKTRACK_NODE_FRAME3, NMEA-0183
+DR_MODE0 NODE LINKTRACK_NODE_FRAME2, LINKTRACK_NODE_FRAME3
+DR_MODE1 NODE LINKTRACK_NODE_FRAME5
+DT_MODE0MASTER *
+SLAVE *
+Typedef
+Byte's Quantities Type
+1 uint8, int8
+2 uint16, int16
+3 unit24, int24
+4 uint32, int32, float
+8 uint64, int64
+Typedef
+Abbreviation Full Title Type
+RW Read Write Terminal can read data from node & write data to node
+RO Read Only Terminal  can only read data from node
+WO Write Only Terminal  can only write data to node
+

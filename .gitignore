@@ -1,0 +1,19 @@
+# 编译产物
+dt_delay_test
+*.o
+*.out
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# Sisyphus 工具目录
+.sisyphus/
+
+# 系统文件
+.DS_Store
+Thumbs.db
