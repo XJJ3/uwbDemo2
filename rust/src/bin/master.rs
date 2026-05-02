@@ -192,41 +192,54 @@ fn main() {
                             continue;
                         }
                         
-                        println!("\n请选择要测试的 Slave 设备 (输入索引或 ID，直接回车选择第一个):");
-                        print!("> ");
-                        io::stdout().flush().ok();
+                        println!("\n可用 Slave 设备:");
+                        for (i, id) in online_slaves.iter().enumerate() {
+                            println!("  [{}] ID: {}", i, id);
+                        }
+                        println!("\n提示: 输入 /t <ID> <次数> 直接测试，或 /t <ID> 使用默认 500 次");
+                        println!("示例: /t 0 200  (测试 Slave ID 0，200 次)");
+                    }
+                    cmd if cmd.starts_with("/t ") || cmd.starts_with("/test ") => {
+                        if in_test {
+                            println!("测试进行中，请先等待测试完成");
+                            continue;
+                        }
+                        if online_slaves.is_empty() {
+                            println!("请先使用 /s 扫描在线 Slave 设备");
+                            continue;
+                        }
                         
-                        let mut input = String::new();
-                        io::stdin().read_line(&mut input).ok();
-                        
-                        let sid = if input.trim().is_empty() {
-                            online_slaves[0]
-                        } else if let Ok(idx) = input.trim().parse::<usize>() {
-                            if idx < online_slaves.len() {
-                                online_slaves[idx]
+                        let parts: Vec<&str> = cmd.split_whitespace().collect();
+                        let sid = if parts.len() >= 2 {
+                            if let Ok(id) = parts[1].parse::<u8>() {
+                                if online_slaves.contains(&id) {
+                                    id
+                                } else {
+                                    println!("Slave ID {} 不在线", id);
+                                    continue;
+                                }
+                            } else if let Ok(idx) = parts[1].parse::<usize>() {
+                                if idx < online_slaves.len() {
+                                    online_slaves[idx]
+                                } else {
+                                    println!("索引 {} 无效", idx);
+                                    continue;
+                                }
                             } else {
-                                println!("索引无效，使用第一个 Slave (ID: {})", online_slaves[0]);
-                                online_slaves[0]
-                            }
-                        } else if let Ok(id) = input.trim().parse::<u8>() {
-                            if online_slaves.contains(&id) {
-                                id
-                            } else {
-                                println!("Slave ID {} 不在线，使用第一个 Slave (ID: {})", id, online_slaves[0]);
-                                online_slaves[0]
+                                println!("无效的 Slave 标识: {}", parts[1]);
+                                continue;
                             }
                         } else {
-                            println!("输入无效，使用第一个 Slave (ID: {})", online_slaves[0]);
                             online_slaves[0]
                         };
                         
-                        print!("请输入测试次数 (默认 500): ");
-                        io::stdout().flush().ok();
+                        let count = if parts.len() >= 3 {
+                            parts[2].parse().unwrap_or(500)
+                        } else {
+                            500
+                        };
                         
-                        input.clear();
-                        io::stdin().read_line(&mut input).ok();
-                        test_limit = input.trim().parse().unwrap_or(500);
-                        
+                        test_limit = count.max(1);
                         slave_id = Some(sid);
                         in_test = true;
                         test_complete = false;
@@ -236,19 +249,24 @@ fn main() {
                         pending_send = true;
                         stats = Stats::new();
                         pending.clear();
+                        frame_buf.clear();
                         
                         let handshake = nlink::build_user_frame1(nlink::Role::Slave as u8, sid, &[]);
                         let _ = serial.write_all(&handshake);
-                        std::thread::sleep(Duration::from_millis(200));
+                        std::thread::sleep(Duration::from_millis(100));
                         
-                        println!("\n开始测试 (目标 Slave ID: {}, 测试次数: {})...\n", sid, test_limit);
+                        println!("\n开始测试 (Slave ID: {}, 测试次数: {})...\n", sid, test_limit);
                     }
                     "/h" | "/help" => {
                         println!("\n命令:");
-                        println!("  /s, /scan  - 扫描在线 Slave 设备");
-                        println!("  /t, /test  - 开始测试");
-                        println!("  /q, /quit  - 退出程序");
-                        println!("  /h, /help  - 显示帮助\n");
+                        println!("  /s, /scan         - 扫描在线 Slave 设备");
+                        println!("  /t <ID> [次数]    - 测试指定 Slave (默认 500 次)");
+                        println!("  /q, /quit         - 退出程序");
+                        println!("  /h, /help         - 显示帮助");
+                        println!("\n示例:");
+                        println!("  /t 0        - 测试 Slave ID 0，500 次");
+                        println!("  /t 0 200    - 测试 Slave ID 0，200 次");
+                        println!("  /t 1 1000   - 测试 Slave ID 1，1000 次\n");
                     }
                     _ => {
                         println!("未知命令: {}。输入 /h 查看帮助。", line);
@@ -272,12 +290,13 @@ fn main() {
             let frame = nlink::build_user_frame1(nlink::Role::Slave as u8, sid, &payload);
             let write_start = Instant::now();
             let _ = serial.write_all(&frame);
+            let _ = serial.flush();
             
             pending.insert(seq, write_start);
             sent_count += 1;
             pending_send = false;
             
-            if sent_count % 100 == 0 {
+            if sent_count <= 3 || sent_count % 50 == 0 {
                 println!("[发送] seq={} 总发送={}", seq, sent_count);
             }
         }
@@ -297,7 +316,7 @@ fn main() {
                                 let rtt = send_time.elapsed().as_micros() as f64 / 1000.0;
                                 stats.add(rtt);
                                 
-                                if recv_count % 100 == 0 {
+                                if recv_count <= 3 || recv_count % 50 == 0 {
                                     println!("[接收] seq={} rtt={:.3}ms 平均={:.3}ms", recv_seq, rtt, stats.avg_ms());
                                 }
                             }

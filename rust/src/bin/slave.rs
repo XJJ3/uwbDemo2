@@ -124,7 +124,6 @@ fn main() {
                 if data.len() >= 6 && &data[0..4] == PROBE_MAGIC {
                     let probed_id = data[4];
                     let probe_seq = data[5];
-                    println!("[探测] 收到探测请求 (目标 ID {}, seq {}, 数据: {:02X?})", probed_id, probe_seq, &data[..8.min(data.len())]);
                     
                     let mut reply_payload = [0u8; 16];
                     reply_payload[0..4].copy_from_slice(PROBE_REPLY);
@@ -134,37 +133,25 @@ fn main() {
                     
                     let reply = nlink::build_user_frame1(nlink::Role::Master as u8, 0, &reply_payload);
                     let _ = serial.write_all(&reply);
-                    println!("[探测] 已发送回复帧");
+                    println!("[探测] 收到探测请求 (ID {})，已回复", probed_id);
+                    continue;
                 }
                 
-                for frame in frame_buf.feed(data) {
-                    if frame.len() >= 4 && &frame[0..4] == PROBE_MAGIC {
-                        println!("[探测] 从帧中匹配到探测请求");
-                        let mut reply_payload = [0u8; 16];
-                        reply_payload[0..4].copy_from_slice(PROBE_REPLY);
-                        
-                        let reply = nlink::build_user_frame1(nlink::Role::Master as u8, 0, &reply_payload);
-                        let _ = serial.write_all(&reply);
-                        println!("[探测] 已回复 {:02X?}", &reply[..16]);
-                        continue;
-                    }
+                if let Some((seq, _ts)) = parse_payload(data) {
+                    recv_count += 1;
                     
-                    if let Some((seq, _ts)) = parse_payload(&frame) {
-                        recv_count += 1;
-                        
-                        let mut ack_payload = [0u8; 16];
-                        ack_payload[0] = SYNC1;
-                        ack_payload[1] = SYNC0;
-                        ack_payload[2] = (seq & 0xFF) as u8;
-                        ack_payload[3] = ((seq >> 8) & 0xFF) as u8;
-                        
-                        let ack = nlink::build_user_frame1(nlink::Role::Slave as u8, self_slave_id, &ack_payload);
-                        let _ = serial.write_all(&ack);
-                        send_count += 1;
-                        
-                        if recv_count % 100 == 0 {
-                            println!("[接收] seq={} 总接收={} 已发ACK={}", seq, recv_count, send_count);
-                        }
+                    let mut ack_payload = [0u8; 16];
+                    ack_payload[0] = SYNC1;
+                    ack_payload[1] = SYNC0;
+                    ack_payload[2] = (seq & 0xFF) as u8;
+                    ack_payload[3] = ((seq >> 8) & 0xFF) as u8;
+                    
+                    let ack = nlink::build_user_frame1(nlink::Role::Slave as u8, self_slave_id, &ack_payload);
+                    let _ = serial.write_all(&ack);
+                    send_count += 1;
+                    
+                    if recv_count <= 3 || recv_count % 100 == 0 {
+                        println!("[接收] seq={} 总接收={} 已发ACK={}", seq, recv_count, send_count);
                     }
                 }
             }
