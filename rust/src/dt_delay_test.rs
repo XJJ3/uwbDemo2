@@ -2,7 +2,7 @@ use clap::Parser;
 use serialport::SerialPort;
 use std::io::{Read, Write};
 use std::time::{Duration, Instant};
-use uwb_delay_test::{nlink, pack_payload, RecvBuffer, Stats, PAYLOAD_HEADER_SIZE};
+use uwb_delay_test::{nlink, pack_payload, Stats, PAYLOAD_HEADER_SIZE, SYNC0, SYNC1};
 
 #[derive(Parser, Debug)]
 #[command(name = "dt_delay_test")]
@@ -68,8 +68,9 @@ fn main() {
 
     let mut pending: Vec<(u64, bool)> = vec![(0u64, false); 65536];
     let mut stats = Stats::new();
-    let mut recv_buf = RecvBuffer::new(args.data_size);
     let mut payload = vec![0u8; args.data_size];
+    let mut recv_buf_data = vec![0u8; 65536];
+    let mut recv_buf_len: usize = 0;
 
     let mut display_seq: u32 = 0;
 
@@ -84,17 +85,32 @@ fn main() {
 
         if let Ok(n) = slave.read(&mut read_buf) {
             if n > 0 {
-                for (s, recv_ns) in recv_buf.feed(&read_buf[..n], now_ns) {
-                    if pending[s as usize].1 {
-                        let delay = (recv_ns - pending[s as usize].0) as f64 / 1_000_000.0;
-                        pending[s as usize].1 = false;
-                        stats.add(delay);
+                if recv_buf_len + n <= recv_buf_data.len() {
+                    recv_buf_data[recv_buf_len..recv_buf_len + n].copy_from_slice(&read_buf[..n]);
+                    recv_buf_len += n;
+                }
+                
+                while recv_buf_len >= args.data_size {
+                    if recv_buf_data[0] == SYNC0 && recv_buf_data[1] == SYNC1 {
+                        let s = recv_buf_data[2] as u16 | ((recv_buf_data[3] as u16) << 8);
+                        let recv_ns = now_ns;
+                        
+                        if pending[s as usize].1 {
+                            let delay = (recv_ns - pending[s as usize].0) as f64 / 1_000_000.0;
+                            pending[s as usize].1 = false;
+                            stats.add(delay);
 
-                        if s as u32 > display_seq {
-                            display_seq = s as u32;
-                            println!("{:>5}  {:>10.3}  {:>14.3}  {:>14.3}  {:>5}",
-                                s, delay, stats.avg_ms(), stats.avg_ms(), stats.lost);
+                            if s as u32 > display_seq {
+                                display_seq = s as u32;
+                                println!("{:>5}  {:>10.3}  {:>14.3}  {:>14.3}  {:>5}",
+                                    s, delay, stats.avg_ms(), stats.avg_ms(), stats.lost);
+                            }
                         }
+                        recv_buf_data.copy_within(args.data_size..recv_buf_len, 0);
+                        recv_buf_len -= args.data_size;
+                    } else {
+                        recv_buf_data.copy_within(1..recv_buf_len, 0);
+                        recv_buf_len -= 1;
                     }
                 }
             }
