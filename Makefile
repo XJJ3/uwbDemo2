@@ -2,16 +2,13 @@ CXX = clang++
 CXXFLAGS = -std=c++17 -O2 -Wall -Wextra
 LDFLAGS = -framework IOKit
 
-TARGET = dt_delay_test
-SRCS = dt_delay_test.cpp
+all: dt_delay_test dt_bidi_test
 
-all: $(TARGET)
+dt_delay_test: dt_delay_test.cpp nlink_utils.hpp
+	$(CXX) $(CXXFLAGS) -o $@ dt_delay_test.cpp $(LDFLAGS)
 
-$(TARGET): $(SRCS) nlink_utils.hpp
-	$(CXX) $(CXXFLAGS) -o $@ $(SRCS) $(LDFLAGS)
+dt_bidi_test: dt_bidi_test.cpp nlink_utils.hpp
+	$(CXX) $(CXXFLAGS) -o $@ dt_bidi_test.cpp $(LDFLAGS)
 
 clean:
-	rm -f $(TARGET)
-
-run: $(TARGET)
-	./$(TARGET) -m /dev/cu.wchusbserial585C0089431 -s /dev/cu.wchusbserial5AB50010561 --slave-id 0 -i 10 -c 100
+	rm -f dt_delay_test dt_bidi_test

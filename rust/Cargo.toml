@@ -1,0 +1,23 @@
+[package]
+name = "uwb_delay_test"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "dt_delay_test"
+path = "src/dt_delay_test.rs"
+
+[[bin]]
+name = "dt_bidi_test"
+path = "src/dt_bidi_test.rs"
+
+[dependencies]
+# 串口通信
+serialport = "4.5"
+
+# 命令行参数解析
+clap = { version = "4.5", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = true
